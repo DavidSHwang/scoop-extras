@@ -12,7 +12,18 @@
             }
         }
     },
-    "post_install": "Remove-Item \"$dir\\`$PLUGINSDIR\", \"$dir\\Uninstall*\" -Recurse",
+    "post_install": [
+        "Remove-Item \"$dir\\`$PLUGINSDIR\", \"$dir\\Uninstall*\" -Recurse",
+        "if ((Get-WinSystemLocale)[0].ToString().SubString(0,2) -ne \"zh\") {",
+        "    Start-Process $dir\\copytranslator.exe",
+        "    Start-Sleep 2",
+        "    Get-Process -Name copytranslator | Stop-Process",
+        "    $configPath = \"~\\copytranslator\\copytranslator.json\"",
+        "    $config = Get-Content $configPath | ConvertFrom-Json",
+        "    $config.localeSetting = \"en\"",
+        "    ConvertTo-Json $config | Set-Content $configPath",
+        "}"
+    ],
     "shortcuts": [
         [
             "copytranslator.exe",
